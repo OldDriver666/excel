@@ -1,7 +1,14 @@
-package com.firstwei.excels;
+/**
+ * 销量
+ */
+package com.firstwei.excels.entity;
 
-import java.util.Date;
+import com.firstwei.excels.ExcelCell;
 
+/**
+ * @author ZN-yyrj015
+ *
+ */
 public class SaleInfo {
 
 	/**
@@ -15,12 +22,6 @@ public class SaleInfo {
 	 */
 	@ExcelCell(cell = "B", name = "销量")
 	private Integer saleQuantity;
-	
-	/**
-	 * 日期
-	 */
-	@ExcelCell(cell = "C", name = "日期")
-	private Date saleDate;
 
 	public String getGoodsName() {
 		return goodsName;
@@ -37,13 +38,6 @@ public class SaleInfo {
 	public void setSaleQuantity(Integer saleQuantity) {
 		this.saleQuantity = saleQuantity;
 	}
-
-	public Date getSaleDate() {
-		return saleDate;
-	}
-
-	public void setSaleDate(Date saleDate) {
-		this.saleDate = saleDate;
-	}
+	
 	
 }

@@ -3,6 +3,7 @@ package com.firstwei.excels;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -67,7 +68,7 @@ public class ExportExcelUtil {
 				int idx = ec.cell().toCharArray()[0] - 'A';
 				Cell cell = row.createCell(idx);
 				field.setAccessible(true);
-				cell.setCellValue(getValue(field, o).toString());
+				setValue(field, o, cell);
 			}
 		}
 	}
@@ -79,10 +80,21 @@ public class ExportExcelUtil {
      * @return
      * @throws Exception
      */
-    public static Object getValue(Field field, Object o) throws Exception {
+    public static void setValue(Field field, Object o, Cell cell) throws Exception {
         if (field.getType().isInstance(new Date())) {
-        	return new SimpleDateFormat("yyyy/MM/dd").format((Date)field.get(o));
+        	cell.setCellValue(new SimpleDateFormat("yyyy/MM/dd").format((Date)field.get(o)));
+		}else if (field.getType().isInstance(new String())) {
+        	cell.setCellValue((String)field.get(o));
+		}else if (field.getType().isInstance(new Integer(0))) {
+       	 	cell.setCellValue((Integer)field.get(o));
+		}else if (field.getType().isInstance(new Double(0))) {
+       	 	cell.setCellValue((Double)field.get(o));
+		} else if (field.getType().isInstance(new Long(0))) {
+			cell.setCellValue((Long)field.get(o));
+		} else if (field.getType().isInstance(new Float(0))) {
+			cell.setCellValue((Float)field.get(o));
+		}else {
+			cell.setCellValue(field.get(o).toString());
 		}
-    	return field.get(o);
 	}
 }
