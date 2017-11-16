@@ -2,7 +2,6 @@ package com.firstwei.excels;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -13,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -24,6 +24,7 @@ public class ImportExcelUtil {
 
 	/**
 	 * Excel导入
+	 * @throws IOException 
 	 * 
 	 * @throws ParseException
 	 * @throws IllegalAccessException
@@ -31,58 +32,41 @@ public class ImportExcelUtil {
 	 * @throws IOException
 	 * @throws InstantiationException
 	 */
-	public static <T> List<T> importExcel(String filePath, Class<T> clazz) {
+	public static <T> List<T> importExcel(String filePath, Class<T> clazz) throws IOException, ReflectiveOperationException, IllegalAccessException {
 		InputStream in = null;
 
-		String fileType = filePath.split("\\.")[1];
+		String fileType = StringUtils.substringAfterLast(filePath, ".");
 		Field[] fields = clazz.getDeclaredFields();
 		Workbook wb = null;
 		List<T> list = new ArrayList<T>();
-		try {
-			in = new FileInputStream(new File(filePath));
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+		in = new FileInputStream(new File(filePath));
+
 		if (fileType.equals("xls")) {
-			try {
 				wb = new HSSFWorkbook(in);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+
 		} else if (fileType.equals("xlsx")) {
-			try {
+
 				wb = new XSSFWorkbook(in);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		}
 		Sheet sheet = wb.getSheetAt(0);
 		int length = sheet.getLastRowNum();
 		for (int i = 1; i <= length; i++) {
 			Row row = sheet.getRow(i);
-			T t;
-			try {
-				t = clazz.newInstance();
-				for (Field field : fields) {
-					ExcelCell ec = field.getAnnotation(ExcelCell.class);
-					int idx = ec.cell().toUpperCase().toCharArray()[0] - 'A';
-					Cell cell = row.getCell(idx);
-					field.setAccessible(true);
-					try {
-						field.set(t, getValue(field.getType(), cell));
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+			T t = clazz.newInstance();
+			for (Field field : fields) {
+				ExcelCell ec = field.getAnnotation(ExcelCell.class);
+				int idx = ec.cell().toUpperCase().toCharArray()[0] - 'A';
+				Cell cell = row.getCell(idx);
+				field.setAccessible(true);
+				try {
+					field.set(t, getValue(field.getType(), cell));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-				list.add(t);
-			} catch (InstantiationException | IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
+			list.add(t);
 		}
 
 		return list;

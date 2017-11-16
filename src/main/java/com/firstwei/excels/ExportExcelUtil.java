@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -22,7 +23,7 @@ public class ExportExcelUtil {
 	 */
     public static void exportExcel(List<?> list, String filePath) throws Exception {
 		Class<?> clazz = list.get(0).getClass();
-		String fileType = filePath.split("\\.")[1];
+		String fileType = StringUtils.substringAfterLast(filePath, ".");
 		Workbook wb = null;
 		
         if (fileType.equals("xls")) {    
